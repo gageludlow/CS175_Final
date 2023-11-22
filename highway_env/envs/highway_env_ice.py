@@ -9,12 +9,13 @@ from highway_env.envs.common.action import Action
 from highway_env.road.road_ice import Road, RoadNetwork # GageComment Adding ice road file here
 from highway_env.utils import near_split
 from highway_env.vehicle.controller import ControlledVehicle
-from highway_env.vehicle.kinematics import Vehicle
+# from highway_env.vehicle.kinematics import Vehicle
+from highway_env.vehicle.kinematics_ice import Vehicle
 
 Observation = np.ndarray
 
 
-class HighwayEnv(AbstractEnv):
+class HighwayEnvIce(AbstractEnv):
     """
     A highway driving environment.
 
@@ -122,7 +123,7 @@ class HighwayEnv(AbstractEnv):
         return self.time >= self.config["duration"]
 
 
-class HighwayEnvFast(HighwayEnv):
+class HighwayEnvFast(HighwayEnvIce):
     """
     A variant of highway-v0 with faster execution:
         - lower simulation frequency

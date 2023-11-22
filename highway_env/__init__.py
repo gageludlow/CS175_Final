@@ -21,6 +21,12 @@ def register_highway_envs():
         entry_point='highway_env.envs:HighwayEnv',
     )
 
+    # highway_env_ice.py
+    register(
+        id='highway-ice-v0',
+        entry_point='highway_env.envs:HighwayEnvIce',
+    )
+
     register(
         id='highway-fast-v0',
         entry_point='highway_env.envs:HighwayEnvFast',
