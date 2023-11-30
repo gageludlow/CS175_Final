@@ -123,7 +123,7 @@ class HighwayEnvIce(AbstractEnv):
         return self.time >= self.config["duration"]
 
 
-class HighwayEnvFast(HighwayEnvIce):
+class HighwayEnvFastIce(HighwayEnvIce):
     """
     A variant of highway-v0 with faster execution:
         - lower simulation frequency
