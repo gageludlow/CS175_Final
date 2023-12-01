@@ -15,7 +15,7 @@ from highway_env.vehicle.kinematics_ice import Vehicle
 Observation = np.ndarray
 
 
-class HighwayEnvIce(AbstractEnv):
+class HighwayIceEnv(AbstractEnv):
     """
     A highway driving environment.
 
@@ -123,7 +123,7 @@ class HighwayEnvIce(AbstractEnv):
         return self.time >= self.config["duration"]
 
 
-class HighwayEnvFast(HighwayEnvIce):
+class HighwayIceFastEnv(HighwayIceEnv):
     """
     A variant of highway-v0 with faster execution:
         - lower simulation frequency
