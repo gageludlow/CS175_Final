@@ -31,7 +31,7 @@ class HighwayIceEnv(AbstractEnv):
                 "type": "Kinematics"
             },
             "action": {
-                "type": "DiscreteMetaAction",
+                "type": "ContinuousAction",
             },
             "lanes_count": 4,
             "vehicles_count": 50,
@@ -106,12 +106,20 @@ class HighwayIceEnv(AbstractEnv):
         # Use forward speed rather than speed, see https://github.com/eleurent/highway-env/issues/268
         forward_speed = self.vehicle.speed * np.cos(self.vehicle.heading)
         scaled_speed = utils.lmap(forward_speed, self.config["reward_speed_range"], [0, 1])
-        return {
-            "collision_reward": float(self.vehicle.crashed),
-            "right_lane_reward": lane / max(len(neighbours) - 1, 1),
-            "high_speed_reward": np.clip(scaled_speed, 0, 1),
-            "on_road_reward": float(self.vehicle.on_road)
-        }
+        if self.vehicle.on_road:
+            return {
+                "collision_reward": float(self.vehicle.crashed),
+                "right_lane_reward": lane / max(len(neighbours) - 1, 1),
+                "high_speed_reward": np.clip(scaled_speed, 0, 1),
+                "on_road_reward": float(self.vehicle.on_road)
+            }
+        else:
+            return {
+                "collision_reward": float(self.vehicle.crashed),
+                "right_lane_reward": lane / max(len(neighbours) - 1, 1),
+                "high_speed_reward": np.clip(scaled_speed, 0, 1),
+                "on_road_reward": float(-1)
+            }
 
     def _is_terminated(self) -> bool:
         """The episode is over if the ego vehicle crashed."""

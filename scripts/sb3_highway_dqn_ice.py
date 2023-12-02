@@ -9,7 +9,7 @@ TRAIN = True
 
 if __name__ == '__main__':
     # Create the environment
-    env = gym.make("highway-ice-fast-v0", render_mode="rgb_array")
+    env = gym.make("highway-ice-v0", render_mode="rgb_array")
     obs, info = env.reset()
 
     # Create the model
@@ -28,7 +28,7 @@ if __name__ == '__main__':
 
     # Train the model
     if TRAIN:
-        model.learn(total_timesteps=int(1000))
+        model.learn(total_timesteps=int(100))
         model.save("highway_dqn/model")
         del model
 

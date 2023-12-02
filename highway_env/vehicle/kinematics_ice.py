@@ -32,7 +32,7 @@ class Vehicle(RoadObject):
     HISTORY_SIZE = 30
     """ Length of the vehicle state history, for trajectory display"""
 
-    SLIP_FACTOR = 0.3  # Probability of slippage
+    SLIP_FACTOR = 0.2  # Probability of slippage
 
     def __init__(self,
                  road: Road,
@@ -144,12 +144,23 @@ class Vehicle(RoadObject):
         """
         self.clip_actions()
         delta_f = self.action['steering']
+        # print("preDelta_f: " + delta_f)
         acceleration = self.action['acceleration']
+        # print("preAcceleration: " + acceleration)
 
         # Simulate slippage due to snow
         if np.random.rand() < self.SLIP_FACTOR:
-            delta_f = np.random.uniform(0.5, 1)  # Reduce steering effectiveness
-            acceleration= np.random.uniform(0, 1)  # Reduce acceleration effectiveness
+            
+            delta_f += np.random.uniform(-np.pi / 16, np.pi / 16)  # Reduce steering effectiveness
+            if(delta_f > np.pi / 4):
+                delta_f = np.pi / 4
+            elif(delta_f < -np.pi / 4):
+                delta_f = -np.pi / 4
+            
+            # print("delta_f: " + delta_f)
+
+            acceleration += np.random.randint(-1, 2)  # Reduce acceleration effectiveness
+            # print("Acceleration: " + acceleration)
 
         beta = np.arctan(1 / 2 * np.tan(delta_f))
         v = self.speed * np.array([np.cos(self.heading + beta),

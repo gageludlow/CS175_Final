@@ -27,3 +27,4 @@ docs/_build
 **jupyter_execute
 
 highway_dqn/
+highway_ppo/
