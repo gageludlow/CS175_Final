@@ -34,7 +34,7 @@ if __name__ == "__main__":
                     verbose=2,
                     tensorboard_log="highway_ppo/")
         # Train the agent
-        model.learn(total_timesteps=int(40000))
+        model.learn(total_timesteps=int(50000))
         # Save the agent
         model.save("highway_ppo/model")
 

@@ -22,7 +22,7 @@ class RoadObject(ABC):
     LENGTH: float = 2  # Object length [m]
     WIDTH: float = 2  # Object width [m]
 
-    def __init__(self, road: 'Road', position: Sequence[float], prev_x_position: float, heading: float = 0, speed: float = 0):
+    def __init__(self, road: 'Road', position: Sequence[float], heading: float = 0, speed: float = 0, prev_x_position: float = 0):
         """
         :param road: the road instance where the object is placed in
         :param position: cartesian position of object in the surface
@@ -31,9 +31,9 @@ class RoadObject(ABC):
         """
         self.road = road
         self.position = np.array(position, dtype=np.float64)
-        self.prev_x_position = prev_x_position
         self.heading = heading
         self.speed = speed
+        self.prev_x_position = prev_x_position
         self.lane_index = self.road.network.get_closest_lane_index(self.position, self.heading) if self.road else np.nan
         self.lane = self.road.network.get_lane(self.lane_index) if self.road else None
 
