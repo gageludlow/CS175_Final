@@ -30,7 +30,7 @@ if(test_ppo):
 elif(test_dqn):
 
     model = DQN.load("highway_dqn/model")
-    env = gym.make("highway-ice-v0", render_mode="rgb_array")
+    env = gym.make("highway-fast-v0", render_mode="rgb_array")
     for _ in range(5):
         obs, info = env.reset()
         done = truncated = False

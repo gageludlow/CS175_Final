@@ -46,9 +46,10 @@ class HighwayIceEnv(AbstractEnv):
             "high_speed_reward": 0.4,  # The reward received when driving at full speed, linearly mapped to zero for
                                        # lower speeds according to config["reward_speed_range"].
             "lane_change_reward": 0,   # The reward received at each lane change action.
+            "forward_progress_reward": 0.1,
             "reward_speed_range": [20, 30],
             "normalize_reward": True,
-            "offroad_terminal": False
+            "offroad_terminal": True
         })
         return config
 
@@ -97,6 +98,9 @@ class HighwayIceEnv(AbstractEnv):
                                  self.config["high_speed_reward"] + self.config["right_lane_reward"]],
                                 [0, 1])
         reward *= rewards['on_road_reward']
+
+        # print(rewards["forward_progress_reward"])
+        reward += rewards['forward_progress_reward']
         return reward
 
     def _rewards(self, action: Action) -> Dict[Text, float]:
@@ -106,19 +110,29 @@ class HighwayIceEnv(AbstractEnv):
         # Use forward speed rather than speed, see https://github.com/eleurent/highway-env/issues/268
         forward_speed = self.vehicle.speed * np.cos(self.vehicle.heading)
         scaled_speed = utils.lmap(forward_speed, self.config["reward_speed_range"], [0, 1])
+
+        if(self.vehicle.position[0] > self.vehicle.prev_x_position):
+            fpr = self.vehicle.position[0] - self.vehicle.prev_x_position
+            self.vehicle.prev_x_position = self.vehicle.position[0]
+        else:
+            fpr = -10
+
+
         if self.vehicle.on_road:
             return {
                 "collision_reward": float(self.vehicle.crashed),
                 "right_lane_reward": lane / max(len(neighbours) - 1, 1),
                 "high_speed_reward": np.clip(scaled_speed, 0, 1),
-                "on_road_reward": float(self.vehicle.on_road)
+                "on_road_reward": float(self.vehicle.on_road),
+                "forward_progress_reward": float(fpr / 10)
             }
         else:
             return {
                 "collision_reward": float(self.vehicle.crashed),
                 "right_lane_reward": lane / max(len(neighbours) - 1, 1),
                 "high_speed_reward": np.clip(scaled_speed, 0, 1),
-                "on_road_reward": float(-1)
+                "on_road_reward": float(-1),
+                "forward_progress_reward": float(self.vehicle.position[0] / 1000)
             }
 
     def _is_terminated(self) -> bool:

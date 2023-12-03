@@ -34,7 +34,7 @@ if __name__ == "__main__":
                     verbose=2,
                     tensorboard_log="highway_ppo/")
         # Train the agent
-        model.learn(total_timesteps=int(150000))
+        model.learn(total_timesteps=int(40000))
         # Save the agent
         model.save("highway_ppo/model")
 
@@ -50,19 +50,19 @@ if __name__ == "__main__":
 
 
 
-    # model = PPO.load("highway_ppo/model", env=env)
-    # env = RecordVideo(env, video_folder="highway_ppo/videos", episode_trigger=lambda e: True)
-    # env.unwrapped.set_record_video_wrapper(env)
-    # env.configure({"simulation_frequency": 15})  # Higher FPS for rendering
+    model = PPO.load("highway_ppo/model", env=env)
+    env = RecordVideo(env, video_folder="highway_ppo/videos", episode_trigger=lambda e: True)
+    env.unwrapped.set_record_video_wrapper(env)
+    env.configure({"simulation_frequency": 15})  # Higher FPS for rendering
 
-    # for videos in range(10):
-    #     done = truncated = False
-    #     obs, info = env.reset()
-    #     while not (done or truncated):
-    #         # Predict
-    #         action, _states = model.predict(obs, deterministic=True)
-    #         # Get reward
-    #         obs, reward, done, truncated, info = env.step(action)
-    #         # Render
-    #         env.render()
-    # env.close()
+    for videos in range(4):
+        done = truncated = False
+        obs, info = env.reset()
+        while not (done or truncated):
+            # Predict
+            action, _states = model.predict(obs, deterministic=True)
+            # Get reward
+            obs, reward, done, truncated, info = env.step(action)
+            # Render
+            env.render()
+    env.close()
