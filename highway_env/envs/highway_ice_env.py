@@ -124,7 +124,7 @@ class HighwayIceEnv(AbstractEnv):
                 "right_lane_reward": lane / max(len(neighbours) - 1, 1),
                 "high_speed_reward": np.clip(scaled_speed, 0, 1),
                 "on_road_reward": float(self.vehicle.on_road),
-                "forward_progress_reward": float(fpr / 10)
+                "forward_progress_reward": float(fpr / 100)
             }
         else:
             return {
@@ -132,7 +132,7 @@ class HighwayIceEnv(AbstractEnv):
                 "right_lane_reward": lane / max(len(neighbours) - 1, 1),
                 "high_speed_reward": np.clip(scaled_speed, 0, 1),
                 "on_road_reward": float(-1),
-                "forward_progress_reward": float(self.vehicle.position[0] / 10)
+                "forward_progress_reward": float(self.vehicle.position[0] / 100)
             }
 
     def _is_terminated(self) -> bool:
