@@ -1,19 +1,22 @@
 import functools
-import gymnasium as gym
+import highway_env
+import subprocess
 import pygame
+import numpy as np
+import gymnasium as gym
 import seaborn as sns
-import torch as th
-from highway_env.utils import lmap
-from stable_baselines3 import PPO
-from torch.distributions import Categorical
 import torch
 import torch.nn as nn
-import numpy as np
+import torch as th
 from torch.nn import functional as F
+from torch.distributions import Categorical
+from torch.cuda import is_available as torch_cuda_is_available
+from gymnasium.wrappers import RecordVideo
+from highway_env.utils import lmap
+from stable_baselines3 import PPO
 from stable_baselines3.common.env_util import make_vec_env
 from stable_baselines3.common.torch_layers import BaseFeaturesExtractor
 from stable_baselines3.common.vec_env import SubprocVecEnv
-import highway_env
 
 # ==================================
 #        Policy Architecture
@@ -247,8 +250,8 @@ def attention(query, key, value, mask=None, dropout=None):
 
 attention_network_kwargs = dict(
     in_size=5*15,
-    embedding_layer_kwargs={"in_size": 7, "layer_sizes": [64, 64], "reshape": False},
-    attention_layer_kwargs={"feature_size": 64, "heads": 2},
+    embedding_layer_kwargs={"in_size": 7, "layer_sizes": [128, 128], "reshape": False}, # was 64 x 64
+    attention_layer_kwargs={"feature_size": 128, "heads": 4}, # was 64 and 2
 )
 
 
@@ -272,14 +275,14 @@ class CustomExtractor(BaseFeaturesExtractor):
 # ==================================
 
 def make_configure_env(**kwargs):
-    env = gym.make(kwargs["id"])
+    env = gym.make(kwargs["id"], render_mode="rgb_array")
     env.configure(kwargs["config"])
     env.reset()
     return env
 
 
 env_kwargs = {
-    'id': 'highway-v0',
+    'id': 'highway-ice-v0',
     'config': {
         "lanes_count": 3,
         "vehicles_count": 15,
@@ -362,35 +365,61 @@ def compute_vehicles_attention(env, model):
 #        Main script
 # ==================================
 
-if __name__ == "__main__":
-    train = True
-    if train:
-        n_cpu = 4
-        policy_kwargs = dict(
-            features_extractor_class=CustomExtractor,
-            features_extractor_kwargs=attention_network_kwargs,
-        )
-        env = make_vec_env(make_configure_env, n_envs=n_cpu, seed=0, vec_env_cls=SubprocVecEnv, env_kwargs=env_kwargs)
-        model = PPO("MlpPolicy", env,
-                    n_steps=512 // n_cpu,
-                    batch_size=64,
-                    learning_rate=2e-3,
-                    policy_kwargs=policy_kwargs,
-                    verbose=2,
-                    tensorboard_log="highway_attention_ppo/")
-        # Train the agent
-        model.learn(total_timesteps=200*1000)
-        # Save the agent
-        model.save("highway_attention_ppo/model")
 
-    model = PPO.load("highway_attention_ppo/model")
-    env = make_configure_env(**env_kwargs)
-    env.render()
-    env.viewer.set_agent_display(functools.partial(display_vehicles_attention, env=env, model=model))
-    for _ in range(5):
-        obs, info = env.reset()
-        done = truncated = False
-        while not (done or truncated):
-            action, _ = model.predict(obs)
-            obs, reward, done, truncated, info = env.step(action)
-            env.render()
+if __name__ == "__main__":
+    # train = True
+    # if train:
+    #     # Check if GPU is available and set the device accordingly
+    #     device = torch.device("cuda" if torch_cuda_is_available() else "cpu")
+    #     print(device)
+        
+    #     n_cpu = 4
+    #     policy_kwargs = dict(
+    #         features_extractor_class=CustomExtractor,
+    #         features_extractor_kwargs=attention_network_kwargs,
+    #     )
+    #     # Move the environment creation to the CPU to prevent conflicts with GPU
+    #     env = make_vec_env(make_configure_env, n_envs=n_cpu, seed=0, vec_env_cls=SubprocVecEnv, env_kwargs=env_kwargs)
+
+    #     # Move the model to the selected device
+    #     model = PPO("MlpPolicy", env,
+    #                 n_steps=1024 // n_cpu, # was n_step 512
+    #                 batch_size=64,
+    #                 learning_rate=3e-4, # was 2e-3
+    #                 policy_kwargs=policy_kwargs,
+    #                 device=device,  # Specify the device
+    #                 verbose=2,
+    #                 tensorboard_log="highway_attention_ppo/",
+    #                 ent_coef=0.01) # added ent_coef=0.01
+
+    #     # Train the agent
+    #     model.learn(total_timesteps=50000)
+
+    #     # Save the agent
+    #     model.save("highway_attention_ppo/model")
+
+    # env = make_configure_env(**env_kwargs)
+    # model = PPO.load("highway_attention_ppo/model", env=env)
+    # env = RecordVideo(env, video_folder="highway_ppo/videos", episode_trigger=lambda e: True)
+    # env.unwrapped.set_record_video_wrapper(env)
+    # env.configure({"simulation_frequency": 15})  # Higher FPS for rendering
+
+    # for videos in range(4):
+    #     done = truncated = False
+    #     obs, info = env.reset()
+    #     while not (done or truncated):
+    #         # Predict
+    #         action, _states = model.predict(obs, deterministic=True)
+    #         # Get reward
+    #         obs, reward, done, truncated, info = env.step(action)
+    #         # Render
+    #         env.render()
+    # env.close()
+
+    # Load TensorBoard after training
+    log_directory = "highway_attention_ppo/"
+    command = f"tensorboard --logdir={log_directory}"
+    process = subprocess.Popen(command, shell=True)
+    process.wait()  # This will block until you stop TensorBoard manually or interrupt the script
+
+

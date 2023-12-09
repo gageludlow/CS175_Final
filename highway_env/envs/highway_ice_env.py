@@ -46,7 +46,7 @@ class HighwayIceEnv(AbstractEnv):
             "high_speed_reward": 0.4,  # The reward received when driving at full speed, linearly mapped to zero for
                                        # lower speeds according to config["reward_speed_range"].
             "lane_change_reward": 0,   # The reward received at each lane change action.
-            "forward_progress_reward": 0.1,
+            # "forward_progress_reward": 0.1,
             "reward_speed_range": [20, 30],
             "normalize_reward": True,
             "offroad_terminal": True
@@ -100,7 +100,7 @@ class HighwayIceEnv(AbstractEnv):
         reward *= rewards['on_road_reward']
 
         # print(rewards["forward_progress_reward"])
-        reward += rewards['forward_progress_reward']
+        # reward += rewards['forward_progress_reward']
         return reward
 
     def _rewards(self, action: Action) -> Dict[Text, float]:
@@ -124,7 +124,7 @@ class HighwayIceEnv(AbstractEnv):
                 "right_lane_reward": lane / max(len(neighbours) - 1, 1),
                 "high_speed_reward": np.clip(scaled_speed, 0, 1),
                 "on_road_reward": float(self.vehicle.on_road),
-                "forward_progress_reward": float(fpr / 100)
+                # "forward_progress_reward": float(fpr / 10)
             }
         else:
             return {
@@ -132,7 +132,7 @@ class HighwayIceEnv(AbstractEnv):
                 "right_lane_reward": lane / max(len(neighbours) - 1, 1),
                 "high_speed_reward": np.clip(scaled_speed, 0, 1),
                 "on_road_reward": float(-1),
-                "forward_progress_reward": float(self.vehicle.position[0] / 100)
+                # "forward_progress_reward": float(self.vehicle.position[0] / 10)
             }
 
     def _is_terminated(self) -> bool:
