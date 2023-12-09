@@ -367,54 +367,54 @@ def compute_vehicles_attention(env, model):
 
 
 if __name__ == "__main__":
-    # train = True
-    # if train:
-    #     # Check if GPU is available and set the device accordingly
-    #     device = torch.device("cuda" if torch_cuda_is_available() else "cpu")
-    #     print(device)
+    train = True
+    if train:
+        # Check if GPU is available and set the device accordingly
+        device = torch.device("cuda" if torch_cuda_is_available() else "cpu")
+        print(device)
         
-    #     n_cpu = 4
-    #     policy_kwargs = dict(
-    #         features_extractor_class=CustomExtractor,
-    #         features_extractor_kwargs=attention_network_kwargs,
-    #     )
-    #     # Move the environment creation to the CPU to prevent conflicts with GPU
-    #     env = make_vec_env(make_configure_env, n_envs=n_cpu, seed=0, vec_env_cls=SubprocVecEnv, env_kwargs=env_kwargs)
+        n_cpu = 4
+        policy_kwargs = dict(
+            features_extractor_class=CustomExtractor,
+            features_extractor_kwargs=attention_network_kwargs,
+        )
+        # Move the environment creation to the CPU to prevent conflicts with GPU
+        env = make_vec_env(make_configure_env, n_envs=n_cpu, seed=0, vec_env_cls=SubprocVecEnv, env_kwargs=env_kwargs)
 
-    #     # Move the model to the selected device
-    #     model = PPO("MlpPolicy", env,
-    #                 n_steps=1024 // n_cpu, # was n_step 512
-    #                 batch_size=64,
-    #                 learning_rate=3e-4, # was 2e-3
-    #                 policy_kwargs=policy_kwargs,
-    #                 device=device,  # Specify the device
-    #                 verbose=2,
-    #                 tensorboard_log="highway_attention_ppo/",
-    #                 ent_coef=0.01) # added ent_coef=0.01
+        # Move the model to the selected device
+        model = PPO("MlpPolicy", env,
+                    n_steps=1024 // n_cpu, # was n_step 512
+                    batch_size=64,
+                    learning_rate=3e-4, # was 2e-3
+                    policy_kwargs=policy_kwargs,
+                    device=device,  # Specify the device
+                    verbose=2,
+                    tensorboard_log="highway_attention_ppo/",
+                    ent_coef=0.01) # added ent_coef=0.01
 
-    #     # Train the agent
-    #     model.learn(total_timesteps=50000)
+        # Train the agent
+        model.learn(total_timesteps=50000)
 
-    #     # Save the agent
-    #     model.save("highway_attention_ppo/model")
+        # Save the agent
+        model.save("highway_attention_ppo/model")
 
-    # env = make_configure_env(**env_kwargs)
-    # model = PPO.load("highway_attention_ppo/model", env=env)
-    # env = RecordVideo(env, video_folder="highway_ppo/videos", episode_trigger=lambda e: True)
-    # env.unwrapped.set_record_video_wrapper(env)
-    # env.configure({"simulation_frequency": 15})  # Higher FPS for rendering
+    env = make_configure_env(**env_kwargs)
+    model = PPO.load("highway_attention_ppo/model", env=env)
+    env = RecordVideo(env, video_folder="highway_ppo/videos", episode_trigger=lambda e: True)
+    env.unwrapped.set_record_video_wrapper(env)
+    env.configure({"simulation_frequency": 15})  # Higher FPS for rendering
 
-    # for videos in range(4):
-    #     done = truncated = False
-    #     obs, info = env.reset()
-    #     while not (done or truncated):
-    #         # Predict
-    #         action, _states = model.predict(obs, deterministic=True)
-    #         # Get reward
-    #         obs, reward, done, truncated, info = env.step(action)
-    #         # Render
-    #         env.render()
-    # env.close()
+    for videos in range(4):
+        done = truncated = False
+        obs, info = env.reset()
+        while not (done or truncated):
+            # Predict
+            action, _states = model.predict(obs, deterministic=True)
+            # Get reward
+            obs, reward, done, truncated, info = env.step(action)
+            # Render
+            env.render()
+    env.close()
 
     # Load TensorBoard after training
     log_directory = "highway_attention_ppo/"
