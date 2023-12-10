@@ -18,9 +18,6 @@ The agent's objective is to reach a high speed while avoiding collisions with ne
 </p>
 
 
-Uploading rl-video-episode-2.mp4…
-
-
 ## Installation
 
 First start by cloning this repo.
