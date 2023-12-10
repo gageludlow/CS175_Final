@@ -23,14 +23,16 @@ Uploading rl-video-episode-2.mp4…
 
 ## Installation
 
-To install this version of highway-env-ice you have to pip install the git folder.
+First start by cloning this repo.
+
+To install this version of highway-env-ice you have to pip install the git repo.
 `cd <root folder of project>`
 Then run pip install on the project folder.
 `pip install -e .`
 
 This will install highway-env-ice, you may also need to pip install other dependencies like pygame, tensorboardx, and gymnasium. if a mac user you will most likely need to use xQuartz for the video recording libraries. This is an app that will need to be downloaded and installed. Windows users should not have an issue here and linux users can just run:
 
-'pip install tensorboardx gym pyvirtualdisplay'
+`pip install tensorboardx gym pyvirtualdisplay`
 
 
 ## Usage
