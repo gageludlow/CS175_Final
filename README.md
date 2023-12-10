@@ -12,7 +12,7 @@ In this task, the ego-vehicle is driving on a slippery multilane highway populat
 The agent's objective is to reach a high speed while avoiding collisions with neighbouring vehicles while also staying on the road. Driving on the right side of the road is also rewarded. There is and option to include a forward Progress reward.
 
 <p align="center">
-    <img src="https://raw.githubusercontent.com/eleurent/highway-env/master/../gh-media/docs/media/highway.gif?raw=true"><br/>
+    <img src="https://github.com/gageludlow/ICS175_Final/blob/master/docs/rl-video-episode-2.mp4"><br/>
     <em>The highway-ice-v0 environment.</em>
 </p>
 
